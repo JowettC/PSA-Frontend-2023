@@ -156,6 +156,7 @@
 
             CONTAINER_DATA.forEach(item => {
                 latestTimestamps = findLatestTimeStamp(item)
+                if (!latestTimestamps) return
                 containerPosition = {
                     lat: latestTimestamps.lat,
                     lng: latestTimestamps.long,
@@ -164,7 +165,7 @@
                     background: colorsPin[indexColor],
                 });
                 indexColor++;
-                console.log(containerPosition)
+    
                 const marker2 = new Marker({
                     map: map,
                     position: containerPosition,
@@ -183,16 +184,22 @@
 
         function flattenData(data) {
             let flattenData = []
-            data.forEach(item => {
-                item.liveLocations.forEach(location => {
-                    flattenData.push({
-                        containerId: item.containerId,
-                        lat: location.lat,
-                        long: location.long,
-                        timestamp: convertUnixToDateString(location.timestamp)
+            try {
+                data.forEach(item => {
+                    item.liveLocations.forEach(location => {
+                        flattenData.push({
+                            containerId: item.containerId,
+                            lat: location.lat,
+                            long: location.long,
+                            timestamp: convertUnixToDateString(location.timestamp)
+                        })
                     })
                 })
-            })
+            }
+            catch (err) {
+            
+            }
+
             return flattenData
         }
         function sortByTimeStamp(data) {
@@ -202,7 +209,11 @@
         }
 
         function findLatestTimeStamp(data) {
-            return data.liveLocations[data.liveLocations.length - 1]
+            try {
+                return data.liveLocations[data.liveLocations.length - 1]
+            } catch (err) {
+                return {}
+            }
         }
 
         function renderTable() {
