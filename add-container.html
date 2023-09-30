@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="icon" href="assets/logo.png" type="image/x-icon">
+    <!-- css -->
+    <link rel="stylesheet" href="assets/style.css">
+    <!-- import axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+    <div id="app">
+        <div class="nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="container-dashboard.html" class="nav-link">Containers</a>
+            <a href="contact.html" class="nav-link">Model</a>
+            <a href="add-container.html" class="nav-link">Form</a>
+        </div>
+        <div class="logo-container">
+            <img src="assets/logo.png" alt="logo" class="logo">
+            <span class="logo-text">Who's gonna <br /> carry the boats</span>
+        </div>
+        <div class="hero-title">Add New Container Log <img class="hero-title-pic" src="./assets/container.png" /></div>
+        <form class="form-container">
+            <!-- container Id -->
+            <div class="form-group">
+                <input type="text" class="text-input" id="containerId" name="containerId" placeholder="Container Id">
+            </div>
+        </form>
+        <div class="button-continer">
+            <div class="custom-btn" style="width:130px; font-weight:bold;" onclick="submit()"> Use My Location</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script>
+        //    get location of user
+        function submit() {
+            const containerId = document.getElementById("containerId").value;
+            if (containerId.length < 5) {
+                alert("Container Id must be at least 5 characters long.");
+                return;
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    axios.post('http://localhost:3000/container/create', {
+                        containerId: containerId,
+                        lat: latitude,
+                        long: longitude
+                    })
+                        .then(function (response) {
+                            console.log(response);
+                            alert("Container Log Added Successfully");
+                            window.location.href = "container-dashboard.html";
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            alert("Error Adding Container Log");
+                        });
+                });
+            } else {
+                alert("Geolocation is not supported by this browser or you did not allow location.");
+                return;
+            }
+        }
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+
+            return [latitude, longitude];
+        }
+
+    </script>
+</body>
+
+</html>

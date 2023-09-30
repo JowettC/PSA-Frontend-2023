@@ -17,7 +17,7 @@ body {
   left: 50%;
   height: 50px;
   z-index: 1;
-  width: 300px;
+  width: 350px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
@@ -209,4 +209,19 @@ body {
 }
 #app{
     min-height:70vh
+}
+.form-container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    margin-top:2rem;
+    margin-bottom:2rem;
+}
+.text-input{
+    padding:10px;
+    border-radius:5px;
+    border:1px solid grey;
+    margin-bottom:1rem;
+    width:300px;
 }
