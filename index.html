@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="icon" href="assets/logo.png" type="image/x-icon">
+    <!-- css -->
+    <link rel="stylesheet" href="assets/style.css">
+
+</head>
+
+<body>
+    <div id="app">
+        <div class="nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="container-dashboard.html" class="nav-link">Containers</a>
+            <a href="contact.html" class="nav-link">Model</a>
+        </div>
+        <div class="logo-container">
+            <img src="assets/logo.png" alt="logo" class="logo">
+            <span class="logo-text">Who's gonna <br /> carry the boats</span>
+        </div>
+        <div class="hero-title">Revolutionizing Port <img class="hero-title-pic"
+                src="./assets/lighthouse.png" />Management with <br/><div class="hero-title-rotate transform-rotate-30">AI/ML
+            </div> Optimization</div>
+        <div class="button-continer">
+            <div class="custom-btn"> Try It</div>
+        </div>
+        <div class="hero-content">
+            <div class="chat-box hero-content-left-box element-rotate">
+                Cutting Edge <br/><span class="color-beige">Solution</span>
+            </div>
+            <div class="chat-box hero-content-right-box element-rotate">
+                 <span class="color-beige">Cost</span> Saving
+            </div>
+            <div class="hero-center-box">
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                message: 'Hello, Vue!'
+            },
+            methods: {
+                changeMessage() {
+                    this.message = 'New Message';
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
