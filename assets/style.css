@@ -190,6 +190,7 @@ body {
   /* background-color:#12229d; */
   margin-right: 0.5rem;
   margin-left: 0.5rem;
+  transition: all 0.3s ease-in-out;
 }
 .basic-btn:hover {
   background-color: white;
@@ -205,4 +206,7 @@ body {
   border-radius: 10px;
   transform: scale(1.2);
   text-decoration: underline;
+}
+#app{
+    min-height:70vh
 }

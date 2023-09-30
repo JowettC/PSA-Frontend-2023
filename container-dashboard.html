@@ -11,6 +11,13 @@
     <link rel="stylesheet" href="assets/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"
+        integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 </head>
 
 <body>
@@ -31,6 +38,7 @@
         </div>
         <!--The div element for the map -->
         <div id="map"></div>
+        <div id="myGrid" style="margin:auto; width: 800px; height: 500px; display:none;" class="ag-theme-alpine"></div>
 
     </div>
     <!-- prettier-ignore -->
@@ -38,29 +46,51 @@
         (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
             key: "AIzaSyB6NvkvaLka8qnLTQci6IBmXN_PXUi5JYU",
             v: "weekly",
-            // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
-            // Add other bootstrap parameters as needed, using camel case.
         });
     </script>
     <script src="https://cdn.socket.io/3.1.3/socket.io.min.js"
         integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
         crossorigin="anonymous"></script>
     <script>
+        const colorsPin = [
+            "#FF5733", // Red
+            "#3498db", // Blue
+            "#2ecc71", // Green
+            "#9b59b6", // Purple
+            "#e67e22", // Orange
+            "#1abc9c", // Teal
+            "#f1c40f", // Yellow
+            "#e91e63", // Pink
+            "#00bcd4", // Cyan
+            "#0052cc", // Deep Blue
+            "#cddc39", // Lime
+            "#ffc107", // Amber
+            "#3f51b5", // Indigo
+            "#8bc34a", // Light Green
+            "#795548"  // Brown
+        ];
+        const columnDefs = [
+            { field: "containerId" },
+            { field: "lat" },
+            { field: "long" },
+            { field: "timestamp" }
+        ];
+        const image = './assets/cargo_resized.png'
         // add active to basic btn when clicked
         const basicBtns = document.querySelectorAll('.basic-btn');
         basicBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 basicBtns.forEach(btn => {
                     btn.classList.remove('disabled');
+                    renderTable()
                 })
-                btn.classList.add('disabled');
             })
         })
         // display map if map btn is disabled else display table
         const mapsBtn = document.querySelector('.maps-btn');
         const tableBtn = document.querySelector('.table-btn');
         const mapDisplay = $('#map');
-        const tableDisplay = $('#table');
+        const tableDisplay = $('#myGrid');
         mapsBtn.addEventListener('click', () => {
             mapDisplay.css('display', 'block');
             tableDisplay.css('display', 'none');
@@ -69,11 +99,12 @@
             mapDisplay.css('display', 'none');
             tableDisplay.css('display', 'block');
         })
-        
 
-       
+
+
 
         CONTAINER_DATA = null;
+        FLATTEN_CONTAINER_DATA = null;
         const socket = io('http://localhost:3000');
         function startConnection() {
             socket.emit("init_map", "");
@@ -90,7 +121,10 @@
 
         socket.on("map_data", (data) => {
             CONTAINER_DATA = data;
+            FLATTEN_CONTAINER_DATA = sortByTimeStamp(flattenData(data))
+            console.log(JSON.stringify(FLATTEN_CONTAINER_DATA))
             initMap();
+            renderTable()
         })
         socket.on("private_message", (message) => {
             console.log(`${message} was received`)
@@ -103,11 +137,10 @@
         async function initMap() {
             console.log('initalising maps')
             // The location of Uluru
-            const position = { lat: -25.344, lng: 131.031 };
+            const position = { lat: -1.3521, lng: 103.8198 };
             // Request needed libraries.
-            //@ts-ignore
             const { Map } = await google.maps.importLibrary("maps");
-            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            const { AdvancedMarkerElement, PinElement, Marker } = await google.maps.importLibrary("marker");
 
             // The map, centered at Uluru
             map = new Map(document.getElementById("map"), {
@@ -116,12 +149,81 @@
                 mapId: "DEMO_MAP_ID",
             });
 
-            // The marker, positioned at Uluru
-            const marker = new AdvancedMarkerElement({
-                map: map,
-                position: position,
-                title: "Uluru",
+            // Find the latest timestamp for each container
+            let indexColor = 0;
+
+
+            CONTAINER_DATA.forEach(item => {
+                latestTimestamps = findLatestTimeStamp(item)
+                containerPosition = {
+                    lat: latestTimestamps.lat,
+                    lng: latestTimestamps.long,
+                }
+                var pinBackground = new PinElement({
+                    background: colorsPin[indexColor],
+                });
+                indexColor++;
+                console.log(containerPosition)
+                const marker2 = new Marker({
+                    map: map,
+                    position: containerPosition,
+                    title: "Uluru",
+                    content: pinBackground.element,
+                    icon: image,
+                    label: item.containerId,
+                });
+
             });
+
+
+
+
+        }
+
+        function flattenData(data) {
+            let flattenData = []
+            data.forEach(item => {
+                item.liveLocations.forEach(location => {
+                    flattenData.push({
+                        containerId: item.containerId,
+                        lat: location.lat,
+                        long: location.long,
+                        timestamp: convertUnixToDateString(location.timestamp)
+                    })
+                })
+            })
+            return flattenData
+        }
+        function sortByTimeStamp(data) {
+            return data.sort((a, b) => {
+                return b.timestamp - a.timestamp
+            })
+        }
+
+        function findLatestTimeStamp(data) {
+            return data.liveLocations[data.liveLocations.length - 1]
+        }
+
+        function renderTable() {
+
+            var gridDivtemp = document.querySelector('#myGrid');
+            gridDivtemp.innerHTML = ''
+
+            const rowData = FLATTEN_CONTAINER_DATA;
+            const gridOptions = {
+                columnDefs: columnDefs,
+                rowData: rowData,
+                defaultColDef: { sortable: true, filter: true },
+            };
+
+            const gridDiv = document.querySelector('#myGrid');
+            new agGrid.Grid(gridDiv, gridOptions);
+
+        }
+
+        function convertUnixToDateString(unixTimestamp) {
+            const formattedDate = dayjs.unix(unixTimestamp).format('YYYY-MM-DD HH:mm');
+            return formattedDate;
         }
     </script>
 </body>
