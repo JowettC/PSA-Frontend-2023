@@ -87,17 +87,17 @@ body {
   border-radius: 30px;
   transition: all 0.3s ease-in-out;
 }
-.hero-title-rotate:hover{
-    transform: rotate(30deg);
+.hero-title-rotate:hover {
+  transform: rotate(30deg);
 }
 .transform-rotate-30 {
   transform: rotate(-25deg);
 }
-.element-rotate{
-    transition: all 0.3s ease-in-out;
+.element-rotate {
+  transition: all 0.3s ease-in-out;
 }
-.element-rotate:hover{
-    transform: rotate(350deg);
+.element-rotate:hover {
+  transform: rotate(350deg);
 }
 .custom-btn {
   font-size: 1em;
@@ -179,4 +179,30 @@ body {
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
+}
+/* Set the size of the div element that contains the map */
+#map {
+  height: 400px; /* The height is 400 pixels */
+  width: 100%; /* The width is the width of the web page */
+}
+.basic-btn {
+  padding: 20px;
+  /* background-color:#12229d; */
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+}
+.basic-btn:hover {
+  background-color: white;
+  color: grey;
+  border-radius: 10px;
+  transform: scale(1.2);
+  text-decoration: underline;
+}
+
+.disabled {
+  background-color: white;
+  color: grey;
+  border-radius: 10px;
+  transform: scale(1.2);
+  text-decoration: underline;
 }

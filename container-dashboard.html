@@ -9,6 +9,7 @@
     <link rel="icon" href="assets/logo.ico" type="image/x-icon">
     <!-- css -->
     <link rel="stylesheet" href="assets/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
 </head>
 
@@ -23,40 +24,62 @@
             <img src="assets/logo.png" alt="logo" class="logo">
             <span class="logo-text">Who's gonna <br /> carry the boats</span>
         </div>
-        <div class="hero-title">Live Container Data <br/><img class="hero-title-pic"
-                src="./assets/cargo.png" /></div>
-
+        <div class="hero-title">Live Container Data <br /><img class="hero-title-pic" src="./assets/cargo.png" /></div>
+        <div class="button-container" style="display:flex; justify-content: center;">
+            <div class="basic-btn maps-btn">Maps</div>
+            <div class="basic-btn table-btn">Table</div>
+        </div>
+        <!--The div element for the map -->
+        <div id="map"></div>
 
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- prettier-ignore -->
     <script>
-        new Vue({
-            el: '#app',
-            data: {
-                message: 'Hello, Vue!'
-            },
-            methods: {
-                changeMessage() {
-                    this.message = 'New Message';
-                }
-            }
+        (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
+            key: "AIzaSyB6NvkvaLka8qnLTQci6IBmXN_PXUi5JYU",
+            v: "weekly",
+            // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+            // Add other bootstrap parameters as needed, using camel case.
         });
     </script>
-    <script src="https://cdn.socket.io/3.1.3/socket.io.min.js" integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh" crossorigin="anonymous"></script>
-
-
-
+    <script src="https://cdn.socket.io/3.1.3/socket.io.min.js"
+        integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
+        crossorigin="anonymous"></script>
     <script>
+        // add active to basic btn when clicked
+        const basicBtns = document.querySelectorAll('.basic-btn');
+        basicBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                basicBtns.forEach(btn => {
+                    btn.classList.remove('disabled');
+                })
+                btn.classList.add('disabled');
+            })
+        })
+        // display map if map btn is disabled else display table
+        const mapsBtn = document.querySelector('.maps-btn');
+        const tableBtn = document.querySelector('.table-btn');
+        const mapDisplay = $('#map');
+        const tableDisplay = $('#table');
+        mapsBtn.addEventListener('click', () => {
+            mapDisplay.css('display', 'block');
+            tableDisplay.css('display', 'none');
+        })
+        tableBtn.addEventListener('click', () => {
+            mapDisplay.css('display', 'none');
+            tableDisplay.css('display', 'block');
+        })
         
 
+       
+
+        CONTAINER_DATA = null;
         const socket = io('http://localhost:3000');
         function startConnection() {
             socket.emit("init_map", "");
         }
 
-
-        window.onbeforeunload = function(){
+        window.onbeforeunload = function () {
             disconnect()
             return 'Are you sure you want to leave?';
         };
@@ -66,12 +89,40 @@
         })
 
         socket.on("map_data", (data) => {
-            console.log(data)
+            CONTAINER_DATA = data;
+            initMap();
         })
         socket.on("private_message", (message) => {
             console.log(`${message} was received`)
         })
+        startConnection()
 
+        // Initialize and add the map
+        let map;
+
+        async function initMap() {
+            console.log('initalising maps')
+            // The location of Uluru
+            const position = { lat: -25.344, lng: 131.031 };
+            // Request needed libraries.
+            //@ts-ignore
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+            // The map, centered at Uluru
+            map = new Map(document.getElementById("map"), {
+                zoom: 4,
+                center: position,
+                mapId: "DEMO_MAP_ID",
+            });
+
+            // The marker, positioned at Uluru
+            const marker = new AdvancedMarkerElement({
+                map: map,
+                position: position,
+                title: "Uluru",
+            });
+        }
     </script>
 </body>
 
