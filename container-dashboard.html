@@ -17,7 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"
         integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 <body>
@@ -25,7 +25,7 @@
         <div class="nav">
             <a href="index.html" class="nav-link">Home</a>
             <a href="container-dashboard.html" class="nav-link">Containers</a>
-            <a href="contact.html" class="nav-link">Model</a>
+            <a href="model.html" class="nav-link">Model</a>
             <a href="add-container.html" class="nav-link">Form</a>
         </div>
         <div class="logo-container">
@@ -49,6 +49,7 @@
             v: "weekly",
         });
     </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.socket.io/3.1.3/socket.io.min.js"
         integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
         crossorigin="anonymous"></script>
@@ -117,18 +118,24 @@
         };
 
         socket.on("new_geolocation", (data) => {
-            console.log(data)
+            console.log("got new timestamp location")
+            launchToast(data.containerId)
+            //  redener table
         })
 
         socket.on("map_data", (data) => {
             CONTAINER_DATA = data;
-            FLATTEN_CONTAINER_DATA = sortByTimeStamp(flattenData(data))
-            console.log(JSON.stringify(FLATTEN_CONTAINER_DATA))
+            FLATTEN_CONTAINER_DATA = flattenData(data)
+            // console.log(JSON.stringify(FLATTEN_CONTAINER_DATA))
+            // console.log(CONTAINER_DATA)
             initMap();
-            renderTable()
+            if (FLATTEN_CONTAINER_DATA.length > 0) {
+                renderTable()
+            }
+
         })
         socket.on("private_message", (message) => {
-            console.log(`${message} was received`)
+            // console.log(`${message} was received`)
         })
         startConnection()
 
@@ -138,14 +145,14 @@
         async function initMap() {
             console.log('initalising maps')
             // The location of Uluru
-            const position = { lat: -1.3521, lng: 103.8198 };
+            const position = { lat: 1.3521, lng: 103.8198 };
             // Request needed libraries.
             const { Map } = await google.maps.importLibrary("maps");
             const { AdvancedMarkerElement, PinElement, Marker } = await google.maps.importLibrary("marker");
 
             // The map, centered at Uluru
             map = new Map(document.getElementById("map"), {
-                zoom: 4,
+                zoom: 12,
                 center: position,
                 mapId: "DEMO_MAP_ID",
             });
@@ -165,7 +172,7 @@
                     background: colorsPin[indexColor],
                 });
                 indexColor++;
-    
+
                 const marker2 = new Marker({
                     map: map,
                     position: containerPosition,
@@ -184,8 +191,9 @@
 
         function flattenData(data) {
             let flattenData = []
-            try {
-                data.forEach(item => {
+
+            data.forEach(item => {
+                try {
                     item.liveLocations.forEach(location => {
                         flattenData.push({
                             containerId: item.containerId,
@@ -194,11 +202,13 @@
                             timestamp: convertUnixToDateString(location.timestamp)
                         })
                     })
-                })
-            }
-            catch (err) {
-            
-            }
+                }
+                catch (err) {
+                    // console.log('invalid data format')
+                }
+            })
+
+
 
             return flattenData
         }
@@ -237,7 +247,22 @@
             const formattedDate = dayjs.unix(unixTimestamp).format('YYYY-MM-DD HH:mm');
             return formattedDate;
         }
+        function launchToast(containerId) {
+            Toastify({
+                text: "There been a new Update for Container ID:" + containerId + "\n\n Click to refresh",
+                duration: 3000,
+                newWindow: true,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                onClick: function () {
+                    window.location.reload();
+                } // Callback after click
+            }).showToast();
+        }
     </script>
+
 </body>
 
 </html>
