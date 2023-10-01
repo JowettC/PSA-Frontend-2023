@@ -168,11 +168,13 @@ body {
   flex-direction: column;
   margin-top: 2rem;
   height: 400px;
-  width: 500px;
+  width: 100%;
+  max-width:400px;
   margin: auto;
 }
 .hero-center-box {
-  width: 500px;
+  width:100%;
+  max-width: 300px;
   background-image: url("/assets/logo.png");
   height: 400px;
   position: absolute;
