@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <!-- add icon -->
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+    <!-- css -->
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"
+        integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="ship-dashboard.html" class="nav-link">Ships</a>
+            <a href="model.html" class="nav-link">Model</a>
+            <a href="add-ship.html" class="nav-link">Form</a>
+        </div>
+        <div class="logo-ship">
+            <img src="assets/logo.png" alt="logo" class="logo">
+            <span class="logo-text">Who's gonna <br /> carry the boats</span>
+        </div>
+        <div class="hero-title">
+            <div class="hero-title-rotate transform-rotate-30">AI/ML
+            </div> Route Prediction <br /><img class="hero-title-pic" src="./assets/delivery.png" />
+        </div>
+        <div class="button-ship" style="display:flex; justify-content: center;">
+            <div class="basic-btn maps-btn">Route Prediction</div>
+            <div class="basic-btn table-btn">Time Arrival Estimation</div>
+        </div>
+        <!--The div element for the map -->
+        <div id="map"></div>
+
+    </div>
+    <!-- prettier-ignore -->
+    <script>
+        (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
+            key: "AIzaSyB6NvkvaLka8qnLTQci6IBmXN_PXUi5JYU",
+            v: "weekly",
+        });
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.socket.io/3.1.3/socket.io.min.js"
+        integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
+        crossorigin="anonymous"></script>
+    <script>
+        const colorsPin = [
+            "#FF5733", // Red
+            "#3498db", // Blue
+            "#2ecc71", // Green
+            "#9b59b6", // Purple
+            "#e67e22", // Orange
+            "#1abc9c", // Teal
+            "#f1c40f", // Yellow
+            "#e91e63", // Pink
+            "#00bcd4", // Cyan
+            "#0052cc", // Deep Blue
+            "#cddc39", // Lime
+            "#ffc107", // Amber
+            "#3f51b5", // Indigo
+            "#8bc34a", // Light Green
+            "#795548"  // Brown
+        ];
+        const image = './assets/ship_resized.png'
+        const middleImage = './assets/dot.png'
+
+        routeData = [
+            {
+                "Latitude Index": 1.2009999990463256,
+                "Longitude Index": 103.46111109852791,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2009999990463256,
+                "Longitude Index": 103.46481481194496,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2050000071525573,
+                "Longitude Index": 103.47222220897675,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2070000112056731,
+                "Longitude Index": 103.47962963581085,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2070000112056731,
+                "Longitude Index": 103.48333331942558,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2089999854564666,
+                "Longitude Index": 103.48703703284264,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2129999935626983,
+                "Longitude Index": 103.48703703284264,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2149999976158141,
+                "Longitude Index": 103.49444442987442,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2149999976158141,
+                "Longitude Index": 103.49814814329147,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            },
+            {
+                "Latitude Index": 1.2149999976158141,
+                "Longitude Index": 103.49814814329147,
+                "SOG Index": 0.15000000596046448,
+                "COG Index": 0.1041666641831398
+            }
+        ]
+        // add active to basic btn when clicked
+        const basicBtns = document.querySelectorAll('.basic-btn');
+        basicBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                basicBtns.forEach(btn => {
+                    btn.classList.remove('disabled');
+                    renderTable()
+                })
+            })
+        })
+        // display map if map btn is disabled else display table
+        const mapsBtn = document.querySelector('.maps-btn');
+        const tableBtn = document.querySelector('.table-btn');
+        const mapDisplay = $('#map');
+        const tableDisplay = $('#myGrid');
+        mapsBtn.addEventListener('click', () => {
+
+        })
+        tableBtn.addEventListener('click', () => {
+
+        })
+
+
+
+
+        CONTAINER_DATA = routeData;
+
+
+        // Initialize and add the map
+        let map;
+
+        async function initMap() {
+            if (CONTAINER_DATA.length == 0)
+                return;
+
+            timeInterval = 60 / CONTAINER_DATA.length
+            // time + time interval 
+            time = dayjs().add(timeInterval, 'minute').format('HH:mm')
+            console.log('initalising maps')
+            // The location of Uluru
+            const position = { lat: CONTAINER_DATA[0]["Latitude Index"], lng: CONTAINER_DATA[0]["Longitude Index"] };
+            // Request needed libraries.
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement, PinElement, Marker } = await google.maps.importLibrary("marker");
+
+            // The map, centered at Uluru
+            map = new Map(document.getElementById("map"), {
+                zoom: 12,
+                center: position,
+                mapId: "DEMO_MAP_ID",
+            });
+            time = dayjs()
+            // Find the latest timestamp for each ship
+            let indexColor = 0;
+
+            CONTAINER_DATA.forEach((item, index) => {
+                time = time.add(timeInterval, 'minute')
+                var timeFormatted = time.format('HH:mm')
+                var icon;
+                shipPosition = {
+                    lat: item["Latitude Index"],
+                    lng: item["Longitude Index"],
+                }
+                var pinBackground = new PinElement({
+                    background: colorsPin[indexColor],
+                });
+                indexColor++;
+
+                if (index === CONTAINER_DATA.length - 1) {
+
+                    const marker2 = new Marker({
+                        map: map,
+                        position: shipPosition,
+                        title: "Uluru",
+                        icon: image,
+                        label: {
+                            text: timeFormatted,
+                            fontSize: "12px", // Adjust font size as needed
+                            fontWeight: "bold",
+                            labelOrigin: new google.maps.Point(0, -20)
+                        },
+                    });
+                } else {
+                    const marker2 = new Marker({
+                        map: map,
+                        position: shipPosition,
+                        title: "Uluru",
+                        icon: middleImage,
+                        label: {
+                            text: timeFormatted,
+                            fontSize: "12px", // Adjust font size as needed
+                            fontWeight: "bold",
+                            labelOrigin: new google.maps.Point(0, -20)
+                        },
+                    });
+                }
+
+            });
+        }
+        function launchToast(shipId) {
+            Toastify({
+                text: "There been a new Update for Ship ID:" + shipId + "\n\n Click to refresh",
+                duration: 3000,
+                newWindow: true,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                onClick: function () {
+                    window.location.reload();
+                } // Callback after click
+            }).showToast();
+        }
+        initMap()
+    </script>
+
+</body>
+
+</html>

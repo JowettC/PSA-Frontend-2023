@@ -17,19 +17,19 @@
     <div id="app">
         <div class="nav">
             <a href="index.html" class="nav-link">Home</a>
-            <a href="container-dashboard.html" class="nav-link">Containers</a>
+            <a href="ship-dashboard.html" class="nav-link">Ships</a>
             <a href="model.html" class="nav-link">Model</a>
-            <a href="add-container.html" class="nav-link">Form</a>
+            <a href="add-ship.html" class="nav-link">Form</a>
         </div>
-        <div class="logo-container">
+        <div class="logo-ship">
             <img src="assets/logo.png" alt="logo" class="logo">
             <span class="logo-text">Who's gonna <br /> carry the boats</span>
         </div>
-        <div class="hero-title">Add New Container Log <img class="hero-title-pic" src="./assets/container.png" /></div>
-        <form class="form-container">
-            <!-- container Id -->
+        <div class="hero-title">Add New Ship Log <img class="hero-title-pic" src="./assets/ship.png" /></div>
+        <form class="form-ship">
+            <!-- ship Id -->
             <div class="form-group">
-                <input type="text" class="text-input" id="containerId" name="containerId" placeholder="Container Id">
+                <input type="text" class="text-input" id="shipId" name="shipId" placeholder="Ship Id">
             </div>
         </form>
         <div class="button-continer">
@@ -41,9 +41,9 @@
     <script>
         //    get location of user
         function submit() {
-            const containerId = document.getElementById("containerId").value;
-            if (containerId.length < 5) {
-                alert("Container Id must be at least 5 characters long.");
+            const shipId = document.getElementById("shipId").value;
+            if (shipId.length < 5) {
+                alert("Ship Id must be at least 5 characters long.");
                 return;
             }
 
@@ -52,19 +52,19 @@
                     const latitude = position.coords.latitude;
                     const longitude = position.coords.longitude;
 
-                    axios.post('http://localhost:3000/container/create', {
-                        containerId: containerId,
+                    axios.post('http://localhost:3000/ship/create', {
+                        shipId: shipId,
                         lat: latitude,
                         long: longitude
                     })
                         .then(function (response) {
                             console.log(response);
-                            alert("Container Log Added Successfully");
-                            window.location.href = "container-dashboard.html";
+                            alert("Ship Log Added Successfully");
+                            window.location.href = "ship-dashboard.html";
                         })
                         .catch(function (error) {
                             console.log(error);
-                            alert("Error Adding Container Log");
+                            alert("Error Adding Ship Log");
                         });
                 });
             } else {

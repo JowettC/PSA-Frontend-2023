@@ -1,5 +1,5 @@
 const columnDefs = [
-    { field: "Container ID" },
+    { field: "Ship ID" },
     { field: "Latitude " },
     { field: "Longitude" },
     { field: "Timestamp" }

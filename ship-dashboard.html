@@ -24,16 +24,16 @@
     <div id="app">
         <div class="nav">
             <a href="index.html" class="nav-link">Home</a>
-            <a href="container-dashboard.html" class="nav-link">Containers</a>
+            <a href="ship-dashboard.html" class="nav-link">Ships</a>
             <a href="model.html" class="nav-link">Model</a>
-            <a href="add-container.html" class="nav-link">Form</a>
+            <a href="add-ship.html" class="nav-link">Form</a>
         </div>
-        <div class="logo-container">
+        <div class="logo-ship">
             <img src="assets/logo.png" alt="logo" class="logo">
             <span class="logo-text">Who's gonna <br /> carry the boats</span>
         </div>
-        <div class="hero-title">Live Container Data <br /><img class="hero-title-pic" src="./assets/cargo.png" /></div>
-        <div class="button-container" style="display:flex; justify-content: center;">
+        <div class="hero-title">Live Ship Data <br /><img class="hero-title-pic" src="./assets/ship.png" /></div>
+        <div class="button-ship" style="display:flex; justify-content: center;">
             <div class="basic-btn maps-btn">Maps</div>
             <div class="basic-btn table-btn">Table</div>
         </div>
@@ -72,12 +72,12 @@
             "#795548"  // Brown
         ];
         const columnDefs = [
-            { field: "containerId" },
+            { field: "shipId" },
             { field: "lat" },
             { field: "long" },
             { field: "timestamp" }
         ];
-        const image = './assets/cargo_resized.png'
+        const image = './assets/ship_resized.png'
         // add active to basic btn when clicked
         const basicBtns = document.querySelectorAll('.basic-btn');
         basicBtns.forEach(btn => {
@@ -119,7 +119,7 @@
 
         socket.on("new_geolocation", (data) => {
             console.log("got new timestamp location")
-            launchToast(data.containerId)
+            launchToast(data.shipId)
             //  redener table
         })
 
@@ -157,14 +157,14 @@
                 mapId: "DEMO_MAP_ID",
             });
 
-            // Find the latest timestamp for each container
+            // Find the latest timestamp for each ship
             let indexColor = 0;
 
 
             CONTAINER_DATA.forEach(item => {
                 latestTimestamps = findLatestTimeStamp(item)
                 if (!latestTimestamps) return
-                containerPosition = {
+                shipPosition = {
                     lat: latestTimestamps.lat,
                     lng: latestTimestamps.long,
                 }
@@ -175,11 +175,11 @@
 
                 const marker2 = new Marker({
                     map: map,
-                    position: containerPosition,
+                    position: shipPosition,
                     title: "Uluru",
                     content: pinBackground.element,
                     icon: image,
-                    label: item.containerId,
+                    label: item.shipId,
                 });
 
             });
@@ -196,7 +196,7 @@
                 try {
                     item.liveLocations.forEach(location => {
                         flattenData.push({
-                            containerId: item.containerId,
+                            shipId: item.shipId,
                             lat: location.lat,
                             long: location.long,
                             timestamp: convertUnixToDateString(location.timestamp)
@@ -247,9 +247,9 @@
             const formattedDate = dayjs.unix(unixTimestamp).format('YYYY-MM-DD HH:mm');
             return formattedDate;
         }
-        function launchToast(containerId) {
+        function launchToast(shipId) {
             Toastify({
-                text: "There been a new Update for Container ID:" + containerId + "\n\n Click to refresh",
+                text: "There been a new Update for Ship ID:" + shipId + "\n\n Click to refresh",
                 duration: 3000,
                 newWindow: true,
                 close: true,

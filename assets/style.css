@@ -44,7 +44,7 @@ body {
   text-decoration: underline;
   /* background-color: black; */
 }
-.logo-container {
+.logo-ship {
   display: flex;
   align-items: center;
   padding-top: 10px;
@@ -131,7 +131,7 @@ body {
 }
 /* media query for < 600px; */
 @media (max-width: 600px) {
-  .logo-container {
+  .logo-ship {
     padding-top: 80px;
   }
   .hero-title {
@@ -210,7 +210,7 @@ body {
 #app{
     min-height:70vh
 }
-.form-container{
+.form-ship{
     display:flex;
     justify-content:center;
     align-items:center;
