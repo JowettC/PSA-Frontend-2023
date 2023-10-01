@@ -107,7 +107,7 @@
 
         CONTAINER_DATA = null;
         FLATTEN_CONTAINER_DATA = null;
-        const socket = io('http://localhost:3000');
+        const socket = io('http://ec2-13-212-190-133.ap-southeast-1.compute.amazonaws.com:3000');
         function startConnection() {
             socket.emit("init_map", "");
         }
@@ -179,7 +179,11 @@
                     title: "Uluru",
                     content: pinBackground.element,
                     icon: image,
-                    label: item.shipId,
+                    label: {
+                        text: item.shipId,
+                        labelOrigin: new google.maps.Point(0, -20),
+                        className: "marker-label"
+                    },
                 });
 
             });
@@ -258,7 +262,7 @@
                 stopOnFocus: true, // Prevents dismissing of toast on hover
                 onClick: function () {
                     window.location.reload();
-                } // Callback after click
+                } 
             }).showToast();
         }
     </script>
