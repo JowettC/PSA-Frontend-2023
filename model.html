@@ -18,6 +18,7 @@
         integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -36,12 +37,41 @@
             <div class="hero-title-rotate transform-rotate-30">AI/ML
             </div> Route Prediction <br /><img class="hero-title-pic" src="./assets/delivery.png" />
         </div>
-        <div class="button-ship" style="display:flex; justify-content: center;">
-            <div class="basic-btn maps-btn">Route Prediction</div>
-            <div class="basic-btn table-btn">Time Arrival Estimation</div>
+        <h3 style="text-align:center">
+            Predict The Route of the Ship
+        </h3>
+        <!-- lat -->
+        <div class="input-group">
+            <label for="lat">Latitude</label>
+            <br />
+            <input type="text" id="lat" name="lat" placeholder="Latitude" class="text-input">
         </div>
+        <!-- long -->
+        <div class="input-group">
+            <label for="long">Longitude</label>
+            <br />
+            <input type="text" id="long" name="long" placeholder="Longitude" class="text-input">
+        </div>
+        <!-- sog -->
+        <div class="input-group">
+            <label for="sog">Speed Over Ground - Knots (1 kt = 1.852 km/h)</label>
+            <br />
+            <input type="text" id="sog" name="sog" placeholder="Speed Over Ground" class="text-input">
+        </div>
+        <!-- cog -->
+        <div class="input-group">
+            <label for="cog">Course Over Ground - direction (degrees relative to true north, 0 = true north)</label>
+            <br />
+            <input type="text" id="cog" name="cog" placeholder="Course Over Ground" class="text-input">
+        </div>
+        <div class="button-continer">
+            <div class="custom-btn" style="width:130px; font-weight:bold;" onclick="submit()"> Predict Route</div>
+        </div>
+        <br />
         <!--The div element for the map -->
         <div id="map"></div>
+        <br />
+        <br />
 
     </div>
     <!-- prettier-ignore -->
@@ -76,68 +106,6 @@
         const image = './assets/ship_resized.png'
         const middleImage = './assets/dot.png'
 
-        routeData = [
-            {
-                "Latitude Index": 1.2009999990463256,
-                "Longitude Index": 103.46111109852791,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2009999990463256,
-                "Longitude Index": 103.46481481194496,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2050000071525573,
-                "Longitude Index": 103.47222220897675,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2070000112056731,
-                "Longitude Index": 103.47962963581085,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2070000112056731,
-                "Longitude Index": 103.48333331942558,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2089999854564666,
-                "Longitude Index": 103.48703703284264,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2129999935626983,
-                "Longitude Index": 103.48703703284264,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2149999976158141,
-                "Longitude Index": 103.49444442987442,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2149999976158141,
-                "Longitude Index": 103.49814814329147,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            },
-            {
-                "Latitude Index": 1.2149999976158141,
-                "Longitude Index": 103.49814814329147,
-                "SOG Index": 0.15000000596046448,
-                "COG Index": 0.1041666641831398
-            }
-        ]
         // add active to basic btn when clicked
         const basicBtns = document.querySelectorAll('.basic-btn');
         basicBtns.forEach(btn => {
@@ -148,26 +116,14 @@
                 })
             })
         })
-        // display map if map btn is disabled else display table
-        const mapsBtn = document.querySelector('.maps-btn');
-        const tableBtn = document.querySelector('.table-btn');
-        const mapDisplay = $('#map');
-        const tableDisplay = $('#myGrid');
-        mapsBtn.addEventListener('click', () => {
 
-        })
-        tableBtn.addEventListener('click', () => {
+        /// when page loads
 
-        })
+        document.getElementById("lat").value = 1.226828;
+        document.getElementById("long").value = 103.502395;
+        document.getElementById("sog").value = 0.9;
+        document.getElementById("cog").value = 0.1;
 
-
-
-
-        CONTAINER_DATA = routeData;
-
-
-        // Initialize and add the map
-        let map;
 
         async function initMap() {
             if (CONTAINER_DATA.length == 0)
@@ -182,7 +138,7 @@
             // Request needed libraries.
             const { Map } = await google.maps.importLibrary("maps");
             const { AdvancedMarkerElement, PinElement, Marker } = await google.maps.importLibrary("marker");
-
+            let map;
             // The map, centered at Uluru
             map = new Map(document.getElementById("map"), {
                 zoom: 12,
@@ -215,9 +171,8 @@
                         icon: image,
                         label: {
                             text: timeFormatted,
-                            fontSize: "12px", // Adjust font size as needed
-                            fontWeight: "bold",
-                            labelOrigin: new google.maps.Point(0, -20)
+                            labelOrigin: new google.maps.Point(0, -20),
+                            className: "marker-label"
                         },
                     });
                 } else {
@@ -228,32 +183,76 @@
                         icon: middleImage,
                         label: {
                             text: timeFormatted,
-                            fontSize: "12px", // Adjust font size as needed
-                            fontWeight: "bold",
-                            labelOrigin: new google.maps.Point(0, -20)
+                            labelOrigin: new google.maps.Point(0, -220),
+                            className: "marker-label"
                         },
                     });
                 }
 
             });
         }
-        function launchToast(shipId) {
+        function launchToast(text) {
             Toastify({
-                text: "There been a new Update for Ship ID:" + shipId + "\n\n Click to refresh",
+                text: text,
                 duration: 3000,
                 newWindow: true,
                 close: true,
-                gravity: "top", // `top` or `bottom`
-                position: "right", // `left`, `center` or `right`
-                stopOnFocus: true, // Prevents dismissing of toast on hover
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
                 onClick: function () {
                     window.location.reload();
-                } // Callback after click
+                }
             }).showToast();
         }
-        initMap()
-    </script>
 
+        function submit() {
+
+
+            var lat = document.getElementById("lat").value;
+            var long = document.getElementById("long").value;
+            var sog = document.getElementById("sog").value;
+            var cog = document.getElementById("cog").value;
+            if (lat == "" || long == "" || sog == "" || cog == "") {
+                alert("Please fill in all the fields");
+                return;
+            }
+            // 1.226828
+            axios.post('http://3.27.33.77:8000/predicted/', {
+                "input_data": [
+                    lat,
+                    long,
+                    sog,
+                    cog
+                ],
+                "num_output": 10,
+                "normalised": true
+            })
+                .then(function (response) {
+                    console.log(response);
+                    launchToast("Route predicted, Check the map");
+                    CONTAINER_DATA = response.data;
+                    initMap()
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    alert("Error Adding Ship Log");
+                });
+        }
+
+    </script>
+    <style>
+        .marker-label {
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            padding-bottom: 30px;
+        }
+
+        .input-group {
+            text-align: center;
+        }
+    </style>
 </body>
 
 </html>
